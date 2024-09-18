@@ -1,0 +1,16 @@
+
+ import "./user.zmodel"  
+
+model MfaConfig {
+
+    id                String        @id @default(uuid())  
+    isEnabled  Boolean        
+    type            String          
+    secret        String          
+    userId        String          
+    user            User?            @relation(fields: [userId], references: [id], name:"user")  
+
+dateCreated DateTime @default(now())
+      dateUpdated DateTime @updatedAt  @default(now())
+      @@allow("all", true)
+}

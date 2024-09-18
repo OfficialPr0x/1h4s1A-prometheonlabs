@@ -1,0 +1,63 @@
+import "./account.zmodel";
+import "./session.zmodel";
+
+import './organizationRole.zmodel'
+
+import './payment.zmodel'
+
+import './file.zmodel'
+
+import './mfaConfig.zmodel'
+
+import './aiResponse.zmodel'
+
+import './subscription.zmodel'
+
+import './auditLog.zmodel'
+
+import "./organizationRole.zmodel";
+
+enum UserStatus {
+    INVITED
+    VERIFIED
+}
+
+model User {
+    id                String             @id @default(uuid())
+    name              String?
+    email             String?            @unique
+    pictureUrl        String?            @default('https://i.imgur.com/ZdJSK3Y.jpeg')
+    tokenInvitation   String?
+    emailVerified     Boolean?
+    
+    stripeCustomerId  String?
+    
+    status            UserStatus         @default(VERIFIED)
+
+    // this is the role of the user for the application
+    globalRole        String             @default('USER')
+    password          String?            @password @omit
+    dateCreated       DateTime           @default(now())
+    dateUpdated       DateTime           @updatedAt @default(now())
+    accounts          Account[]
+    sessions          Session[]
+    
+    organizationRoles OrganizationRole[]
+    roles             String[]           @default([])
+
+payments    Payment[]  @relation("user")  
+        files          File[]        @relation("user")  
+        mfaConfigs  MfaConfig[]  @relation("user")  
+        aiResponses  AiResponse[]  @relation("user")  
+        subscriptions  Subscription[]  @relation("user")  
+        auditLogs  AuditLog[]  @relation("user")  
+
+
+@@auth()
+    @@allow("all", auth().id == this.id)
+    @@allow('all', auth().globalRole == 'ADMIN')
+
+    //we only allow that user to register if they don't create an admin role
+    @@allow("create", globalRole != 'ADMIN')
+    @@allow("read", true)
+}

@@ -1,0 +1,17 @@
+
+
+model RagVector {
+    id        String   @id @default(uuid())
+    key       String
+    url       String
+    tags      String[] @default([])
+    vectors   Bytes?   @omit
+    documents Bytes?   @omit
+    dateCreated DateTime @default(now())
+    dateUpdated DateTime @updatedAt
+
+
+    @@allow("all", true)
+    @@index([key])
+}
+

@@ -1,0 +1,19 @@
+import "./organizationRole.zmodel";
+
+import './organizationRole.zmodel'
+
+model Organization {
+    id               String             @id @default(uuid())
+    name             String
+    pictureUrl       String?            @default('https://i.imgur.com/BgkFiid.jpeg')
+    
+    stripeCustomerId String?
+    
+    dateCreated      DateTime           @default(now())
+    dateUpdated      DateTime           @updatedAt @default(now())
+    roles            OrganizationRole[]
+
+@@allow('all', auth().globalRole == 'ADMIN')
+    @@allow('all', roles?[user == auth() && name == 'owner'])
+    @@allow('read', roles?[user == auth()])
+}
